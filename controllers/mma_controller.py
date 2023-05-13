@@ -21,34 +21,26 @@ class MMAController(Controller):
         self.models = [model_1, model_2, model_3]
         self.i = 0
         self.Tp = Tp
-        self.u_prev = np.array([[0], [0]])
-        self.x_prev = np.array([0, 0, 0, 0])
-        self.x_m_dot_prev = np.zeros((3, 4))
-        self.Kd = 1.0
-        self.Kp = 10.0
+        self.u_prev = np.zeros((2, 1))
+        self.x_prev = np.zeros(4)
+        self.Kd = 20.0
+        self.Kp = 50.0
 
     def choose_model(self, x):
         # TODO: Implement procedure of choosing the best fitting model from self.models (by setting self.i)
         err = [0, 0, 0]
         for i, model in enumerate(self.models):
             x_m_dot = model.x_dot(self.x_prev, self.u_prev)
-            # print('x_m_dot: ', x_m_dot)
-            q_m_dot_1 = self.x_prev[2] + ((x_m_dot[2] + self.x_m_dot_prev[i][2]) / 2 * self.Tp)
-            q_m_dot_2 = self.x_prev[3] + ((x_m_dot[3] + self.x_m_dot_prev[i][3]) / 2 * self.Tp)
-            self.x_m_dot_prev[i] = x_m_dot.ravel()
-            print(q_m_dot_1)
-            err[i] = (abs(x[2] - q_m_dot_1) + abs(x[3] - q_m_dot_2)) / 2
+            x_m = self.x_prev + self.Tp * x_m_dot.flatten()
+            err[i] = (abs(x[2] - x_m[2]) + abs(x[3] - x_m[3])) / 2
 
-        # print(err)
         self.i = np.argmin(err)
-        # print(self.i)
         self.x_prev = x
 
     def calculate_control(self, x, q_r, q_r_dot, q_r_ddot):
         self.choose_model(x)
         q1, q2, q1_dot, q2_dot = x
-        # v = q_r_ddot + self.Kd * (q_r_dot - np.array([q1_dot, q2_dot])) + self.Kp * (q_r - np.array([q1, q2]))
-        v = q_r_ddot
+        v = q_r_ddot + self.Kd * (q_r_dot - np.array([q1_dot, q2_dot])) + self.Kp * (q_r - np.array([q1, q2]))
         M = self.models[self.i].M(x)
         C = self.models[self.i].C(x)
         u = M @ v[:, np.newaxis] + C @ np.array([q1_dot, q2_dot])[:, np.newaxis]
