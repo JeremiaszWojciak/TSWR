@@ -17,14 +17,14 @@ end = 5
 traj_gen = Sinusoidal(np.array([0., 1.]), np.array([2., 2.]), np.array([0., 0.]))
 # traj_gen = Poly3(np.array([0., 0.]), np.array([pi/4, pi/6]), end)
 
-b_est_1 = None
-b_est_2 = None
-kp_est_1 = None
-kp_est_2 = None
-kd_est_1 = None
-kd_est_2 = None
-p1 = None
-p2 = None
+b_est_1 = 3
+b_est_2 = 3
+kp_est_1 = 60
+kp_est_2 = 60
+kd_est_1 = 10
+kd_est_2 = 10
+p1 = 200
+p2 = 200
 
 q0, qdot0, _ = traj_gen.generate(0.)
 q1_0 = np.array([q0[0], qdot0[0]])
@@ -38,26 +38,33 @@ eso1 = np.array(controller.joint_controllers[0].eso.states)
 eso2 = np.array(controller.joint_controllers[1].eso.states)
 
 plt.subplot(221)
-plt.plot(T, eso1[:, 0])
-plt.plot(T, Q[:, 0], 'r')
+plt.plot(T, eso1[:, 0], label="q1_hat")
+plt.plot(T, Q[:, 0], 'r', label="q1")
+plt.legend()
 plt.subplot(222)
-plt.plot(T, eso1[:, 1])
-plt.plot(T, Q[:, 2], 'r')
+plt.plot(T, eso1[:, 1], label="q1_dot_hat")
+plt.plot(T, Q[:, 2], 'r', label="q1_dot")
+plt.legend()
 plt.subplot(223)
-plt.plot(T, eso2[:, 0])
-plt.plot(T, Q[:, 1], 'r')
+plt.plot(T, eso2[:, 0], label="q2_hat")
+plt.plot(T, Q[:, 1], 'r', label="q2")
+plt.legend()
 plt.subplot(224)
-plt.plot(T, eso2[:, 1])
-plt.plot(T, Q[:, 3], 'r')
+plt.plot(T, eso2[:, 1], label="q2_dot_hat")
+plt.plot(T, Q[:, 3], 'r', label="q2_dot")
+plt.legend()
 plt.show()
 
 plt.subplot(221)
-plt.plot(T, Q[:, 0], 'r')
-plt.plot(T, Q_d[:, 0], 'b')
+plt.plot(T, Q[:, 0], 'r', label="q1")
+plt.plot(T, Q_d[:, 0], 'b', label="q1_d")
+plt.legend()
 plt.subplot(222)
-plt.plot(T, Q[:, 1], 'r')
-plt.plot(T, Q_d[:, 1], 'b')
+plt.plot(T, Q[:, 1], 'r', label="q2")
+plt.plot(T, Q_d[:, 1], 'b', label="q2_d")
+plt.legend()
 plt.subplot(223)
-plt.plot(T, u[:, 0], 'r')
-plt.plot(T, u[:, 1], 'b')
+plt.plot(T, u[:, 0], 'r', label="u1")
+plt.plot(T, u[:, 1], 'b', label="u2")
+plt.legend()
 plt.show()
